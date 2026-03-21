@@ -1,0 +1,13 @@
+.next
+node_modules
+out
+apps/*/.next
+apps/*/node_modules
+apps/*/out
+apps/*/.env
+apps/*/.env.local
+apps/*/.env.*.local
+apps/*/data/images.json
+apps/*/public/uploads
+apps/*/public/archive
+apps/*/public/extracted
