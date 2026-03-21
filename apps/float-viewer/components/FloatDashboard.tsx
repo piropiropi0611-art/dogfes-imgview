@@ -116,7 +116,7 @@ export function FloatDashboard() {
     <div className="dashboardShell">
       <div className="heroBlock">
         <p className="eyebrow">Float Viewer</p>
-        <h1>抽出した犬画像が会場背景をふわふわ飛び回る</h1>
+        <h1>ふわふわわんこ in 犬まつり</h1>
         <p className="heroLead">
           このサイトでは、アップロードした画像へ背景除去を適用して抽出画像を作り、
           ふちゅう犬まつりの背景上を複数の犬画像が漂う様子を楽しめます。

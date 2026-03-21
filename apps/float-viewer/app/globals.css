@@ -272,14 +272,16 @@ input {
 .floatingScene {
   position: relative;
   overflow: hidden;
-  min-height: 460px;
+  min-height: clamp(300px, 78vw, 420px);
+  aspect-ratio: 4 / 3;
   border-radius: 22px;
   background: rgba(15, 23, 42, 0.8);
   isolation: isolate;
 }
 
 .sceneBackground {
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center center;
 }
 
 .sceneEmpty {
@@ -400,7 +402,7 @@ input {
 }
 
 .viewerStageWrap .floatingScene {
-  min-height: calc(100vh - 240px);
+  min-height: min(72svh, 560px);
   border-radius: 28px;
 }
 
@@ -426,7 +428,12 @@ input {
   }
 
   .floatingScene {
+    aspect-ratio: auto;
     min-height: 720px;
+  }
+
+  .sceneBackground {
+    object-fit: cover;
   }
 
   .viewerPageShell {

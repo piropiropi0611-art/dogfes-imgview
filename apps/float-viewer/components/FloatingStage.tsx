@@ -212,7 +212,7 @@ export function FloatingStage({ images }: FloatingStageProps) {
     <section className="panel scenePanel">
       <div className="panelHeader">
         <p className="eyebrow">Viewer</p>
-        <h2>ふわふわ飛び回る抽出画像</h2>
+        <h2>ふわふわわんこ in 犬まつり</h2>
       </div>
 
       <div className="sceneMeta">
