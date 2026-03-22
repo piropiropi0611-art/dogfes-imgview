@@ -62,9 +62,9 @@ export function ViewerOnlyScreen() {
       <div className="viewerTopBar">
         <div className="viewerHeading">
           <p className="eyebrow">Viewer Mode</p>
-          <h1>飛ぶ画像だけを大きく表示</h1>
+          <h1>ふわふわわんこ in ふちゅう犬まつり</h1>
           <p className="heroLead">
-            閲覧用として、抽出済みの犬画像だけを大きな表示領域で確認できます。
+            撮影させて頂いた一部のワンちゃんたちをふわふわと浮かせています
           </p>
         </div>
 

@@ -155,6 +155,7 @@ export function FloatDashboard() {
           helperText="抽出画像のみを個別に削除できます。"
           deletingImageId={deletingImageId}
           onDelete={(image) => void handleDelete(image)}
+          showPreview
         />
       </div>
     </div>
