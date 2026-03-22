@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { removeSourceBackgroundLocally } from "@/lib/ai/preprocess";
+import { createTempPreview } from "@/lib/storage/temp-preview";
 
 export const runtime = "nodejs";
 
@@ -37,13 +38,18 @@ export async function POST(request: Request) {
       Buffer.from(arrayBuffer),
       fileEntry.type,
     );
-    const previewUrl = `data:${extractedImage.mimeType};base64,${extractedImage.buffer.toString("base64")}`;
+    const preview = await createTempPreview({
+      buffer: extractedImage.buffer,
+      mimeType: extractedImage.mimeType,
+      size: extractedImage.buffer.byteLength,
+    });
 
     return NextResponse.json(
       {
-        previewUrl,
-        mimeType: extractedImage.mimeType,
-        size: extractedImage.buffer.byteLength,
+        previewUrl: preview.previewUrl,
+        previewToken: preview.previewToken,
+        mimeType: preview.mimeType,
+        size: preview.size,
       },
       { status: 200 },
     );

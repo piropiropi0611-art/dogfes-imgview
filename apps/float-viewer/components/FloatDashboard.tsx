@@ -146,6 +146,7 @@ export function FloatDashboard() {
           helperText="元画像を削除すると、対応する抽出画像も一緒に削除されます。"
           deletingImageId={deletingImageId}
           onDelete={(image) => void handleDelete(image)}
+          showPreview
         />
         <ImageSummaryList
           title="抽出済み画像"

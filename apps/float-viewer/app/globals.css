@@ -325,11 +325,52 @@ input {
 
 .summaryCard {
   display: grid;
-  gap: 4px;
+  gap: 10px;
   padding: 14px 16px;
   border-radius: 16px;
   background: rgba(8, 15, 31, 0.82);
   border: 1px solid rgba(148, 163, 184, 0.12);
+  cursor: pointer;
+}
+
+.summaryCardExpanded {
+  border-color: rgba(125, 211, 252, 0.26);
+  box-shadow: inset 0 0 0 1px rgba(125, 211, 252, 0.08);
+}
+
+.summaryRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 72px;
+  align-items: center;
+  gap: 12px;
+}
+
+.summaryPreview {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  aspect-ratio: 4 / 3;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.summaryThumb {
+  position: relative;
+  width: 72px;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.summaryPreviewImage {
+  object-fit: cover;
+}
+
+.summaryBody {
+  display: grid;
+  gap: 4px;
 }
 
 .summaryTitle,
@@ -340,7 +381,6 @@ input {
 .summaryActions {
   display: flex;
   justify-content: flex-end;
-  margin-top: 8px;
 }
 
 .summaryDeleteButton {

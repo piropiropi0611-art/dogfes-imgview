@@ -5,17 +5,20 @@ import { NextResponse } from "next/server";
 import { removeSourceBackgroundLocally } from "@/lib/ai/preprocess";
 import { getStorageProvider } from "@/lib/storage";
 import { filePathFromUrl } from "@/lib/storage/local";
+import { consumeTempPreview } from "@/lib/storage/temp-preview";
 
 export const runtime = "nodejs";
 
 type PreprocessRequestBody = {
   imageId?: string;
+  previewToken?: string;
 };
 
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as PreprocessRequestBody;
     const imageId = body.imageId?.trim();
+    const previewToken = body.previewToken?.trim();
 
     if (!imageId) {
       return NextResponse.json(
@@ -50,12 +53,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ image: existingExtractedImage }, { status: 200 });
     }
 
-    const sourceImagePath = filePathFromUrl(sourceImage.url);
-    const sourceBuffer = await readFile(sourceImagePath);
-    const extractedImage = await removeSourceBackgroundLocally(
-      sourceBuffer,
-      sourceImage.mimeType,
-    );
+    const extractedImage = previewToken
+      ? await consumeTempPreview(previewToken)
+      : await (async () => {
+          const sourceImagePath = filePathFromUrl(sourceImage.url);
+          const sourceBuffer = await readFile(sourceImagePath);
+          return removeSourceBackgroundLocally(sourceBuffer, sourceImage.mimeType);
+        })();
 
     const savedImage = await storage.saveImage({
       buffer: extractedImage.buffer,
@@ -72,6 +76,10 @@ export async function POST(request: Request) {
     const message =
       error instanceof Error ? error.message : "画像抽出に失敗しました。";
 
-    return NextResponse.json({ error: message }, { status: 500 });
+    const status =
+      message.includes("見つかりません") || message.includes("有効期限")
+        ? 404
+        : 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }

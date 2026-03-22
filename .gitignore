@@ -8,6 +8,7 @@ apps/*/.env
 apps/*/.env.local
 apps/*/.env.*.local
 apps/*/data/images.json
+apps/*/data/temp-previews
 apps/*/public/uploads
 apps/*/public/archive
 apps/*/public/extracted

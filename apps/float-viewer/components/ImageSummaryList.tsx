@@ -1,3 +1,6 @@
+import Image from "next/image";
+import { useState } from "react";
+
 import type { ImageRecord } from "@/lib/storage/types";
 
 type ImageSummaryListProps = {
@@ -7,6 +10,7 @@ type ImageSummaryListProps = {
   helperText?: string;
   deletingImageId?: string | null;
   onDelete?: (image: ImageRecord) => void;
+  showPreview?: boolean;
 };
 
 function formatDate(value: string) {
@@ -23,7 +27,10 @@ export function ImageSummaryList({
   helperText,
   deletingImageId,
   onDelete,
+  showPreview,
 }: ImageSummaryListProps) {
+  const [expandedImageId, setExpandedImageId] = useState<string | null>(null);
+
   return (
     <section className="panel">
       <div className="panelHeader">
@@ -37,17 +44,52 @@ export function ImageSummaryList({
       ) : (
         <div className="summaryList">
           {images.map((image) => (
-            <article className="summaryCard" key={image.id}>
-              <p className="summaryTitle">{image.storedName}</p>
-              <p className="summaryMeta">
-                {formatDate(image.createdAt)} / {(image.size / 1024 / 1024).toFixed(2)} MB
-              </p>
+            <article
+              className={`summaryCard${expandedImageId === image.id ? " summaryCardExpanded" : ""}`}
+              key={image.id}
+              onClick={() =>
+                setExpandedImageId((current) => (current === image.id ? null : image.id))
+              }
+            >
+              <div className="summaryRow">
+                <div className="summaryBody">
+                  <p className="summaryTitle">{image.storedName}</p>
+                  <p className="summaryMeta">
+                    {formatDate(image.createdAt)} / {(image.size / 1024 / 1024).toFixed(2)} MB
+                  </p>
+                </div>
+                {showPreview ? (
+                  <div className="summaryThumb">
+                    <Image
+                      src={image.url}
+                      alt={image.storedName}
+                      fill
+                      sizes="72px"
+                      className="summaryPreviewImage"
+                    />
+                  </div>
+                ) : null}
+              </div>
+              {showPreview && expandedImageId === image.id ? (
+                <div className="summaryPreview">
+                  <Image
+                    src={image.url}
+                    alt={image.storedName}
+                    fill
+                    sizes="(max-width: 899px) 100vw, 420px"
+                    className="summaryPreviewImage"
+                  />
+                </div>
+              ) : null}
               {onDelete ? (
                 <div className="summaryActions">
                   <button
                     className="secondaryButton summaryDeleteButton"
                     type="button"
-                    onClick={() => onDelete(image)}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onDelete(image);
+                    }}
                     disabled={deletingImageId === image.id}
                   >
                     {deletingImageId === image.id ? "削除中..." : "削除"}

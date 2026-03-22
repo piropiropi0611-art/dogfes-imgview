@@ -12,6 +12,7 @@ type FloatUploaderProps = {
 export function FloatUploader({ onUploaded }: FloatUploaderProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState("");
+  const [previewToken, setPreviewToken] = useState("");
   const [localPreviewUrl, setLocalPreviewUrl] = useState("");
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -51,6 +52,7 @@ export function FloatUploader({ onUploaded }: FloatUploaderProps) {
     setErrorMessage("");
     setStatusMessage("抽出画像を確認用に作成しています...");
     setPreviewUrl("");
+    setPreviewToken("");
 
     try {
       const formData = new FormData();
@@ -64,16 +66,23 @@ export function FloatUploader({ onUploaded }: FloatUploaderProps) {
       const previewPayload = (await previewResponse.json()) as {
         error?: string;
         previewUrl?: string;
+        previewToken?: string;
       };
 
-      if (!previewResponse.ok || !previewPayload.previewUrl) {
+      if (
+        !previewResponse.ok ||
+        !previewPayload.previewUrl ||
+        !previewPayload.previewToken
+      ) {
         throw new Error(previewPayload.error ?? "抽出画像の確認に失敗しました。");
       }
 
       setPreviewUrl(previewPayload.previewUrl);
+      setPreviewToken(previewPayload.previewToken);
       setStatusMessage("抽出画像を確認しました。問題なければアップロードしてください。");
     } catch (error) {
       setStatusMessage("");
+      setPreviewToken("");
       setErrorMessage(
         error instanceof Error ? error.message : "抽出画像の確認に失敗しました。",
       );
@@ -90,7 +99,7 @@ export function FloatUploader({ onUploaded }: FloatUploaderProps) {
       return;
     }
 
-    if (!previewUrl) {
+    if (!previewUrl || !previewToken) {
       setErrorMessage("先に抽出画像を確認してください。");
       return;
     }
@@ -117,7 +126,7 @@ export function FloatUploader({ onUploaded }: FloatUploaderProps) {
         throw new Error(uploadPayload.error ?? "アップロードに失敗しました。");
       }
 
-      setStatusMessage("背景除去で保存用の抽出画像を作成しています...");
+      setStatusMessage("確認済みの抽出画像を保存しています...");
 
       const preprocessResponse = await fetch("/api/preprocess", {
         method: "POST",
@@ -126,6 +135,7 @@ export function FloatUploader({ onUploaded }: FloatUploaderProps) {
         },
         body: JSON.stringify({
           imageId: uploadPayload.image.id,
+          previewToken,
         }),
       });
 
@@ -141,6 +151,7 @@ export function FloatUploader({ onUploaded }: FloatUploaderProps) {
       onUploaded(uploadPayload.image, preprocessPayload.image);
       setSelectedFile(null);
       setPreviewUrl("");
+      setPreviewToken("");
       setStatusMessage("抽出画像を追加しました。背景の上をふわふわ飛びます。");
     } catch (error) {
       setStatusMessage("");
@@ -174,6 +185,7 @@ export function FloatUploader({ onUploaded }: FloatUploaderProps) {
             onChange={(event) => {
               setSelectedFile(event.target.files?.[0] ?? null);
               setPreviewUrl("");
+              setPreviewToken("");
               setErrorMessage("");
               setStatusMessage("");
             }}
