@@ -123,7 +123,7 @@ export function FloatDashboard() {
         </p>
         <div className="heroActionRow">
           <Link className="secondaryButton heroLinkButton" href="/viewer">
-            飛ぶ画像だけを大きく見る
+            閲覧用画面に移動
           </Link>
         </div>
         <p className="heroLead">

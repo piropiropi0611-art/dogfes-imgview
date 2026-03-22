@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { FloatingStage } from "@/components/FloatingStage";
@@ -73,9 +72,6 @@ export function ViewerOnlyScreen() {
           <span className="viewerCount">
             {isLoading ? "読み込み中..." : `${extractedImages.length} 件を表示中`}
           </span>
-          <Link className="secondaryButton viewerLinkButton" href="/">
-            通常画面へ戻る
-          </Link>
         </div>
       </div>
 

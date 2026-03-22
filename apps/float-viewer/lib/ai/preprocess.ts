@@ -19,7 +19,7 @@ type PreprocessedImage = {
 
 const ALPHA_THRESHOLD = 8;
 const MIN_TRIMMED_AREA = 64;
-const MAX_BACKGROUND_REMOVAL_DIMENSION = 1600;
+const MAX_BACKGROUND_REMOVAL_DIMENSION = 1280;
 
 function normalizedMimeType(format: string | undefined, fallbackMimeType: string) {
   switch (format) {

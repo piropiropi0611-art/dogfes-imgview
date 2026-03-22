@@ -1,10 +1,6 @@
-import { readFile } from "node:fs/promises";
-
 import { NextResponse } from "next/server";
 
-import { removeSourceBackgroundLocally } from "@/lib/ai/preprocess";
 import { getStorageProvider } from "@/lib/storage";
-import { filePathFromUrl } from "@/lib/storage/local";
 import { consumeTempPreview } from "@/lib/storage/temp-preview";
 
 export const runtime = "nodejs";
@@ -43,6 +39,13 @@ export async function POST(request: Request) {
     if (!imageId) {
       return NextResponse.json(
         { error: "前処理対象の元画像を選択してください。" },
+        { status: 400 },
+      );
+    }
+
+    if (!previewToken) {
+      return NextResponse.json(
+        { error: "先に抽出画像を確認してください。確認済みプレビューのみ保存できます。" },
         { status: 400 },
       );
     }
@@ -100,14 +103,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ image: existingExtractedImage }, { status: 200 });
     }
 
-    const extractionMode = previewToken ? "temp-preview" : "fallback-preprocess";
-    const extractedImage = previewToken
-      ? await consumeTempPreview(previewToken)
-      : await (async () => {
-          const sourceImagePath = filePathFromUrl(sourceImage.url);
-          const sourceBuffer = await readFile(sourceImagePath);
-          return removeSourceBackgroundLocally(sourceBuffer, sourceImage.mimeType);
-        })();
+    const extractionMode = "temp-preview";
+    const extractedImage = await consumeTempPreview(previewToken);
 
     const savedImage = await storage.saveImage({
       buffer: extractedImage.buffer,
@@ -127,14 +124,11 @@ export async function POST(request: Request) {
         sourceBytes: sourceSize,
         sourceSize: formatBytes(sourceSize),
         extractionMode,
-        preparedBytes: "stats" in extractedImage ? extractedImage.stats.preparedBytes : null,
-        preparedSize:
-          "stats" in extractedImage
-            ? formatBytes(extractedImage.stats.preparedBytes)
-            : null,
-        preparedWidth: "stats" in extractedImage ? extractedImage.stats.preparedWidth : null,
-        preparedHeight: "stats" in extractedImage ? extractedImage.stats.preparedHeight : null,
-        wasResized: "stats" in extractedImage ? extractedImage.stats.wasResized : null,
+        preparedBytes: null,
+        preparedSize: null,
+        preparedWidth: null,
+        preparedHeight: null,
+        wasResized: null,
         outputBytes: extractedImage.buffer.byteLength,
         outputSize: formatBytes(extractedImage.buffer.byteLength),
         elapsedMs: Date.now() - startedAt,
