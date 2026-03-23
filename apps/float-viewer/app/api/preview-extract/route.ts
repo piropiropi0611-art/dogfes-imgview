@@ -84,6 +84,7 @@ export async function POST(request: Request) {
         inputSize: formatBytes(inputSize),
         preparedBytes: extractedImage.stats.preparedBytes,
         preparedSize: formatBytes(extractedImage.stats.preparedBytes),
+        preparedMimeType: extractedImage.stats.preparedMimeType,
         preparedWidth: extractedImage.stats.preparedWidth,
         preparedHeight: extractedImage.stats.preparedHeight,
         wasResized: extractedImage.stats.wasResized,

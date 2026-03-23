@@ -4,6 +4,7 @@ import sharp from "sharp";
 type BackgroundRemovalStats = {
   originalBytes: number;
   preparedBytes: number;
+  preparedMimeType: string;
   originalWidth: number | null;
   originalHeight: number | null;
   preparedWidth: number | null;
@@ -20,47 +21,42 @@ type PreprocessedImage = {
 const ALPHA_THRESHOLD = 8;
 const MIN_TRIMMED_AREA = 64;
 const MAX_BACKGROUND_REMOVAL_DIMENSION = 1280;
-
-function normalizedMimeType(format: string | undefined, fallbackMimeType: string) {
-  switch (format) {
-    case "jpeg":
-    case "jpg":
-      return "image/jpeg";
-    case "png":
-      return "image/png";
-    case "webp":
-      return "image/webp";
-    default:
-      return fallbackMimeType || "image/jpeg";
-  }
-}
+const PREPARED_MIME_TYPE = "image/jpeg";
 
 async function prepareSourceImage(
   buffer: Buffer,
-  mimeType: string,
+  _mimeType: string,
 ): Promise<{
   buffer: Buffer;
   mimeType: string;
   stats: BackgroundRemovalStats;
 }> {
+  void _mimeType;
   const image = sharp(buffer, { animated: false }).rotate();
   const metadata = await image.metadata();
   const originalWidth = metadata.width ?? null;
   const originalHeight = metadata.height ?? null;
-  const prepared = image.resize({
-    width: MAX_BACKGROUND_REMOVAL_DIMENSION,
-    height: MAX_BACKGROUND_REMOVAL_DIMENSION,
-    fit: "inside",
-    withoutEnlargement: true,
-  });
+  const prepared = image
+    .resize({
+      width: MAX_BACKGROUND_REMOVAL_DIMENSION,
+      height: MAX_BACKGROUND_REMOVAL_DIMENSION,
+      fit: "inside",
+      withoutEnlargement: true,
+    })
+    .flatten({ background: "#ffffff" })
+    .jpeg({
+      quality: 82,
+      mozjpeg: true,
+    });
   const { data, info } = await prepared.toBuffer({ resolveWithObject: true });
 
   return {
     buffer: data,
-    mimeType: normalizedMimeType(info.format, mimeType),
+    mimeType: PREPARED_MIME_TYPE,
     stats: {
       originalBytes: buffer.byteLength,
       preparedBytes: data.byteLength,
+      preparedMimeType: PREPARED_MIME_TYPE,
       originalWidth,
       originalHeight,
       preparedWidth: info.width ?? null,
